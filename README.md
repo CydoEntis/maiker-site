@@ -1,6 +1,6 @@
-# maitty.app
+# maitty.app (Maiker)
 
-The landing page for [Maitty](https://github.com/CydoEntis/maitty), built
+The landing page for [Maiker](https://github.com/CydoEntis/maitty) (formerly Maitty), built
 with [Astro](https://astro.build) and [Tailwind CSS](https://tailwindcss.com)
 into one static HTML page.
 
@@ -30,7 +30,7 @@ pnpm preview   # serves dist/
   maps the tokens to utilities: `bg-card`, `text-teal`, and `tm-*` for the
   terminal mocks' colours (`text-tm-amber`).
 - `public/boot.js` runs before first paint: it sets the theme (a `?theme=`
-  link, then `localStorage['maitty-theme']`, then the system preference) and
+  link, then `localStorage['maiker-theme']`, then the system preference) and
   the visitor's OS for the install tabs. It is a file rather than an inline
   script so the CSP needs no script hashes.
 - Phones (560px and under, the `phone:` variant in `global.css`) get the

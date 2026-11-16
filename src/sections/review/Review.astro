@@ -1,0 +1,54 @@
+---
+import { cls, FILES, prefix } from "./files";
+const first = FILES[0];
+---
+<section id="review" aria-labelledby="h-review" class="sec">
+  <div class="wrap">
+    <p data-rv class="eyebrow">A worktree each, review in place</p>
+    <h2 data-rv id="h-review" class="h2" style="max-width:20ch">Nine agents. Nine branches. Zero collisions.</h2>
+    <p data-rv class="lede" style="max-width:60ch">Every new agent gets its own Git worktree, so no two ever edit the same file. Read the diff beside the chat, commit, merge or open the pull request, and the worktree tidies itself away once it's clean and merged.</p>
+    <div data-rv data-rv-big role="group" aria-label="Changes panel demo" class="panel" data-review>
+      <div class="left">
+        <div class="path">acme-store-worktrees/fix-lockfile</div>
+        <div class="ch">Changes 3</div>
+        {FILES.map((f, i) => (
+          <button type="button" class="file" data-file={i} aria-pressed={i === 0}>
+            <span class="fp">{f.path}</span><span class="a">{f.add}</span><span class="d">{f.del}</span>
+          </button>
+        ))}
+        <div class="btns">
+          <button type="button" class="commit" data-commit>Commit 3 files</button>
+          <button type="button" class="pr" data-pr>Create PR</button>
+        </div>
+      </div>
+      <pre tabindex="0" data-diff aria-label={`Diff of ${first.path}`}>{first.diff.map(([k, t]) => <div class={`l ${cls(k)}`}>{prefix(k) + t}</div>)}</pre>
+    </div>
+    {FILES.map((f, i) => (
+      <template data-tpl={i}>{f.diff.map(([k, t]) => <div class={`l ${cls(k)}`}>{prefix(k) + t}</div>)}</template>
+    ))}
+  </div>
+</section>
+
+<style>
+  .panel { margin-top: 44px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; box-shadow: var(--shadow); overflow: hidden; display: flex; flex-wrap: wrap; }
+  .left { flex: 1 1 280px; border-right: 1px solid var(--line); padding: 16px; }
+  .path { font: 400 12px var(--font-mono); color: var(--dim); }
+  .ch { margin: 14px 0 8px; font: 600 12px var(--font-sans); color: var(--muted); }
+  .file { width: 100%; display: flex; gap: 8px; align-items: center; padding: 9px 10px; border: 0; border-radius: 6px; background: transparent; color: var(--text); font: 400 13px var(--font-mono); text-align: left; }
+  .file[aria-pressed="true"] { background: var(--raised); }
+  .fp { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .a { color: var(--done); } .d { color: var(--failed); }
+  .btns { display: flex; flex-direction: column; gap: 8px; margin-top: 18px; }
+  .btns button { height: 40px; border-radius: 6px; font: 600 13px var(--font-mono); }
+  .commit { border: 0; background: var(--inv-bg); color: var(--inv-fg); }
+  .pr { border: 1px solid var(--line2); background: transparent; color: var(--strong); }
+  pre { flex: 3 1 440px; min-width: 0; padding: 16px 0; font: 400 13px/1.75 var(--font-mono); color: var(--text); overflow: auto; background: var(--card); }
+  pre :global(.l) { padding: 0 20px; white-space: pre; }
+  pre :global(.lh) { color: var(--dim); }
+  pre :global(.la) { color: var(--done); background: var(--add); }
+  pre :global(.ld) { color: var(--failed); background: var(--del); }
+</style>
+
+<script>
+  import "./review";
+</script>

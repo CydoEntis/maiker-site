@@ -1,0 +1,124 @@
+---
+// The desktop app, rebuilt as static markup at its native 1280 by 800 and
+// scaled to fit (hero.ts sets --s). It is the app's chat view: sidebar
+// grouped by status, a chat with tool calls, the "Wants to run a command"
+// card and the pane header. hero.ts makes Allow and Deny and the sidebar work.
+import { SESSIONS, type SessionState } from "../../lib/sessions";
+import { CHATS } from "./desktop-data";
+
+const groups: [SessionState, string][] = [["needs", "Needs you"], ["working", "Working"], ["done", "Finished"], ["idle", "Idle"]];
+const sel = "a";
+const prefix: Record<string, string> = { u: "", t: "● ", s: "└ ", e: "└ ", a: "" };
+---
+<div class="gui" data-gui style="--s:1">
+  <div class="stage">
+    <div class="app" aria-label="The Maiker desktop app, interactive" role="group">
+      <div class="title"><img src="/img/maiker-logo.png" alt="" width="16" height="16" /><span>M<span class="ai">ai</span>ker</span></div>
+      <div class="body">
+        <aside class="side">
+          <div class="side-h">Sessions <span class="dim">{SESSIONS.length}</span></div>
+          {groups.map(([st, title]) => {
+            const rows = SESSIONS.filter((s) => s.state === st);
+            return (
+              <section data-g={st} data-state={st} hidden={rows.length === 0}>
+                <h3>{title} <span data-gcount>{rows.length}</span></h3>
+                <div data-glist>
+                  {rows.map((s) => (
+                    <button type="button" class="row" data-gsess={s.id} data-state={s.state} data-on={s.id === sel ? "" : undefined}>
+                      <span class="badge" aria-hidden="true">{st === "working" ? <span data-spin>⠋</span> : st === "needs" ? "!" : st === "done" ? "✓" : ""}</span>
+                      <span class="nm"><b>{s.name}</b><span class="pj">{s.project}{s.machine ? ` · ${s.machine}` : ""}</span></span>
+                      <span class="mk">{s.mark}</span>
+                    </button>
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+        </aside>
+        <div class="chat">
+          {SESSIONS.map((s) => {
+            const c = CHATS[s.id];
+            return (
+              <div class="pane" data-chat={s.id} hidden={s.id !== sel}>
+                <header><b>{c.title}</b><span class="dim">{s.project} ⎇ {s.branch}{s.machine ? ` · ${s.machine}` : ""}</span><span class="mk">{s.mark} {s.agent}</span></header>
+                <div class="feed" data-feed>
+                  <div class="inner">
+                    {c.lines.map(([k, t]) => (<div class={`ln k-${k}`}><span class="pre">{prefix[k]}</span>{t}</div>))}
+                  </div>
+                </div>
+                <div class="foot">
+                  {s.id === "a" && (
+                    <div class="needs" data-needs>
+                      <div class="nh"><span class="bang">!</span> Wants to run a command</div>
+                      <code>$ {c.cmd}</code>
+                      <p>{c.why}</p>
+                      <div class="nb"><button type="button" class="allow" data-allow>Allow</button><button type="button" class="deny" data-deny>Deny</button></div>
+                    </div>
+                  )}
+                  <div class="status" data-status data-state={s.state}>{s.state === "working" ? <><span data-spin>⠋</span> Working</> : s.state === "done" ? "✓ Finished" : s.state === "idle" ? "○ Idle" : ""}</div>
+                  <div class="composer" aria-hidden="true"><span class="dim">Message {s.name}…</span><span class="send">↑</span></div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <div class="tools" aria-hidden="true"><i>▤</i><i>±</i><i>▸</i><i>⌕</i><i>⚙</i></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .gui .stage { position: relative; overflow: hidden; height: calc(800px * var(--s)); background: #0f1013; }
+  .gui .app { position: absolute; left: 0; top: 0; width: max(1280px, calc(100% / var(--s))); height: 800px; transform: scale(var(--s)); transform-origin: 0 0; display: flex; flex-direction: column; background: #0f1013; color: var(--t-text); font: 400 14px/1.5 var(--font-sans); text-align: left; }
+  .gui .title { height: 38px; flex: none; display: flex; align-items: center; gap: 8px; padding: 0 14px; font: 600 12px var(--font-sans); color: var(--t-strong); }
+  .gui .body { flex: 1; min-height: 0; display: flex; gap: 8px; padding: 0 8px 8px; }
+  .gui .side { flex: 0 0 21%; border: 1px solid var(--t-line); border-radius: 10px; background: var(--t-card); padding: 14px 8px; overflow: hidden; }
+  .gui .side-h { padding: 0 8px 10px; font: 600 12px var(--font-sans); color: var(--t-dim); }
+  .gui .dim { color: var(--t-dim); }
+  .gui .side h3 { margin: 10px 8px 4px; font: 600 11px var(--font-sans); letter-spacing: .06em; text-transform: uppercase; color: var(--t-dim); }
+  .gui .side [data-g="needs"] h3 { color: #f2a446; }
+  .gui .row { width: 100%; display: flex; align-items: center; gap: 10px; padding: 7px 8px; border: 0; border-radius: 6px; background: transparent; color: var(--t-text); text-align: left; }
+  .gui .row[data-on] { background: var(--t-sel); }
+  .gui .row:hover { background: #1d1f24; }
+  .gui .badge { flex: none; width: 16px; height: 16px; border-radius: 4px; display: grid; place-items: center; font: 600 11px var(--font-mono); background: #1d1f24; color: var(--c); }
+  .gui [data-state="needs"] .badge, .gui .row[data-state="needs"] .badge { background: #f2a446; color: #1a1206; }
+  .gui .nm { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+  .gui .nm b { font-weight: 600; font-size: 13px; color: var(--t-strong); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gui .pj { font-size: 11px; color: var(--t-dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .gui .mk { color: var(--t-dim); font: 400 12px var(--font-mono); }
+  .gui .chat { flex: 1; min-width: 0; border: 1px solid var(--t-line); border-radius: 10px; background: var(--t-card); display: flex; flex-direction: column; }
+  .gui .pane { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .gui .pane[hidden] { display: none; }
+  .gui .pane header { height: 48px; flex: none; border-bottom: 1px solid var(--t-line); display: flex; align-items: center; gap: 12px; padding: 0 16px; }
+  .gui .pane header b { font-weight: 600; color: var(--t-strong); }
+  .gui .pane header .dim { font: 400 12px var(--font-mono); }
+  .gui .pane header .mk { margin-left: auto; }
+  .gui .feed { flex: 1; min-height: 0; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
+  .gui .inner { width: min(760px, 86%); margin: 0 auto; padding: 24px 0; display: flex; flex-direction: column; gap: 8px; }
+  .gui .ln { font-size: 14px; color: var(--t-strong); }
+  .gui .ln.k-u { align-self: flex-end; max-width: 70%; padding: 8px 12px; border-radius: 8px; background: var(--t-sel); }
+  .gui .ln.k-t { font: 400 13px var(--font-mono); padding: 7px 12px; border: 1px solid var(--t-line); border-radius: 8px; background: #1b1c21; color: var(--t-text); }
+  .gui .ln.k-t .pre { color: #6fd492; }
+  .gui .ln.k-s, .gui .ln.k-e { font: 400 12px var(--font-mono); color: var(--t-dim); padding-left: 14px; margin-top: -4px; }
+  .gui .ln.k-e { color: #ff7a70; }
+  .gui .ln.k-a { color: var(--t-text); }
+  .gui .foot { flex: none; width: min(760px, 86%); margin: 0 auto; padding: 0 0 16px; display: flex; flex-direction: column; gap: 10px; }
+  .gui .needs { border: 1px solid #f2a446; border-radius: 10px; background: rgba(242,164,70,.1); padding: 12px 14px; box-shadow: 0 0 0 4px rgba(242,164,70,.08); }
+  .gui .needs[hidden] { display: none; }
+  .gui .nh { font: 600 13px var(--font-sans); color: #f2a446; display: flex; align-items: center; gap: 8px; }
+  .gui .bang { width: 16px; height: 16px; border-radius: 4px; display: inline-grid; place-items: center; background: #f2a446; color: #1a1206; font: 700 11px var(--font-mono); }
+  .gui .needs code { display: block; margin: 8px 0 4px; padding: 8px 10px; border-radius: 6px; background: #0f1013; color: var(--t-strong); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gui .needs p { font-size: 12px; color: var(--t-dim); }
+  .gui .nb { display: flex; gap: 8px; margin-top: 10px; }
+  .gui .nb button { height: 30px; padding: 0 14px; border-radius: 6px; font: 600 13px var(--font-sans); }
+  .gui .allow { border: 0; background: #f2a446; color: #1a1206; }
+  .gui .deny { border: 1px solid #38383c; background: transparent; color: var(--t-text); }
+  .gui .status { font: 400 12px var(--font-mono); color: var(--c); min-height: 18px; }
+  .gui .status:empty { display: none; }
+  .gui .composer { height: 96px; border: 1px solid var(--t-line); border-radius: 10px; background: #1b1c21; padding: 12px 14px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 14px; }
+  .gui .send { width: 28px; height: 28px; border-radius: 6px; background: var(--t-sel); display: grid; place-items: center; color: var(--t-strong); }
+  .gui .tools { flex: 0 0 40px; border: 1px solid var(--t-line); border-radius: 10px; background: var(--t-card); display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 12px 0; }
+  .gui .tools i { font-style: normal; color: var(--t-dim); font-size: 15px; }
+  .gui [data-state="working"] { --c: #82b4ff; } .gui [data-state="needs"] { --c: #f2a446; } .gui [data-state="done"] { --c: #6fd492; } .gui [data-state="idle"] { --c: #94949c; }
+</style>

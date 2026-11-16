@@ -1,35 +1,51 @@
 ---
-// #install: the ship rides the wave above the second install block.
-import Sky from "../decor/Sky.astro";
-import Waves from "../decor/Waves.astro";
-import InstallBlock from "./InstallBlock.astro";
-
-const LINKS = [
-  ["README", "https://github.com/CydoEntis/maitty#readme"],
-  ["Guide", "https://github.com/CydoEntis/maitty/blob/main/docs/guide.md"],
-  ["Releases", "https://github.com/CydoEntis/maitty/releases"],
-];
+import { RELEASES } from "../../site";
+import { COMMANDS, OSES } from "./commands";
 ---
-<section id="install" aria-labelledby="f-title" class="relative overflow-hidden border-t border-line">
-  <Sky />
-  <div class="relative z-[1] -mb-14 flex justify-center px-[clamp(16px,4vw,32px)] pt-[clamp(56px,8vw,96px)]">
-    <div class="ship w-[min(100%,560px)]">
-      <img src="/img/hero-ship-960.webp" srcset="/img/hero-ship-480.webp 480w, /img/hero-ship-960.webp 960w, /img/hero-ship-1280.webp 1280w" sizes="(max-width: 600px) 92vw, 560px" decoding="async" loading="lazy" alt="The Maitty ship, crewed by robot sailors" width="1502" height="909" class="block h-auto w-full [filter:var(--shipf)]" />
+<section id="install" aria-labelledby="h-install" class="inv">
+  <div class="in">
+    <img data-rv src="/img/maiker-logo.png" alt="Maiker logo" width="88" height="88" style="display:block" />
+    <h2 data-rv id="h-install">Put them to work.</h2>
+    <p data-rv class="lede">One line for the terminal app. Maiker still installs and runs as <code>maitty</code> while the rename finishes.</p>
+    <div data-rv role="tablist" aria-label="Operating system" class="tabs">
+      {OSES.map((os) => <button type="button" role="tab" aria-selected={os === "nix"} data-os-tab={os}>{COMMANDS[os].tab}</button>)}
     </div>
-  </div>
-  <Waves />
-  <div class="bg-water pb-[clamp(80px,11vw,140px)]">
-    <div class="relative z-[4] mx-auto flex max-w-[760px] flex-col items-center gap-[22px] px-[clamp(16px,4vw,32px)] text-center">
-      <h2 data-reveal id="f-title" class="m-0 font-display text-[clamp(30px,5vw,60px)]/[1.05] font-extrabold tracking-[-.04em] text-strong">Install M<span class="text-teal">ai</span>tty.</h2>
-      <p class="m-0 text-[19px] text-text">Free and open source. Windows, macOS and Linux. No account, no admin rights.</p>
-      <InstallBlock id="footer" variant="footer" />
-      <div class="flex flex-wrap justify-center gap-x-7 gap-y-2.5">
-        {LINKS.map(([label, href]) => <a class="font-mono text-sm/[normal] font-semibold text-teal underline hover:text-strong" href={href}>{label}</a>)}
+    <div data-rv class="row">
+      <pre tabindex="0" data-cmd-block aria-label={`Install command for ${COMMANDS.nix.shell}`}><span class="dim" data-cmd-prompt>{COMMANDS.nix.prompt}</span> <span data-cmd>{COMMANDS.nix.cmd}</span></pre>
+      <button type="button" class="copy" data-copy aria-label={`Copy the install command: ${COMMANDS.nix.cmd}`}><span data-copy-label>Copy</span></button>
+    </div>
+    <p data-rv class="fact"><span data-shell>{COMMANDS.nix.shell}</span> · checksum verified · no admin rights · connects the agents it finds</p>
+    <div data-rv class="desk">
+      <div class="deskt">
+        <h3>The desktop app</h3>
+        <p>Windows .msi · .exe — macOS .dmg (Apple Silicon) — Linux .AppImage · .deb · .rpm. Brings its own service; install both apps from one release to share sessions.</p>
       </div>
+      <a href={RELEASES}>Latest release ↓</a>
     </div>
   </div>
 </section>
 
 <style>
-  .ship { animation: mtShip 7s ease-in-out infinite; transform-origin: 50% 90%; }
+  .inv { position: relative; overflow: hidden; background: var(--inv-bg); color: var(--inv-fg); }
+  .in { position: relative; max-width: 1100px; margin: 0 auto; padding: clamp(80px, 10vw, 144px) 24px; }
+  h2 { margin-top: 28px; font: 800 clamp(36px, 6.4vw, 96px)/1 var(--font-display); letter-spacing: -.05em; }
+  .lede { margin-top: 18px; max-width: 52ch; font-size: 18px; color: inherit; opacity: .8; }
+  .lede code { font: 600 16px var(--font-mono); }
+  .tabs { display: flex; gap: 4px; margin-top: 36px; }
+  .tabs button { height: 38px; padding: 0 16px; border: 1px solid transparent; border-radius: 6px; background: transparent; color: inherit; font: 600 13px var(--font-mono); opacity: .7; }
+  .row { margin-top: 12px; display: flex; gap: 10px; align-items: stretch; flex-wrap: wrap; }
+  pre { flex: 1 1 320px; min-width: 0; padding: 18px 20px; background: var(--bg); color: var(--strong); border-radius: 10px; font: 400 14px/1.6 var(--font-mono); overflow: auto; white-space: pre; }
+  .dim { color: var(--dim); }
+  .copy { min-height: 56px; min-width: 110px; padding: 0 20px; border: 0; border-radius: 10px; background: var(--needs); color: var(--on-accent); font: 700 14px var(--font-mono); }
+  .fact { margin-top: 12px; font: 400 13px var(--font-mono); opacity: .75; }
+  .desk { margin-top: 44px; padding-top: 28px; border-top: 1px solid rgba(127,127,127,.35); display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+  .deskt { flex: 1 1 320px; }
+  h3 { font: 700 18px var(--font-display); }
+  .deskt p { margin-top: 6px; font-size: 15px; opacity: .8; }
+  .desk a { display: inline-flex; align-items: center; height: 50px; padding: 0 22px; border: 1px solid currentColor; border-radius: 8px; font: 600 15px var(--font-sans); text-decoration: none; color: inherit; }
+  .desk a:hover { color: inherit; }
 </style>
+
+<script>
+  import "./install";
+</script>

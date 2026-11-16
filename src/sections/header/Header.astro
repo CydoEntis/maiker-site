@@ -1,20 +1,35 @@
 ---
-import ThemeToggle from "./ThemeToggle.astro";
-
-const link = "py-3 text-text no-underline hover:text-teal";
+import { REPO } from "../../site";
 ---
-<header class="sticky top-0 z-20 animate-[mtDrop_.6s_ease-out_both] border-b border-line bg-[color-mix(in_srgb,var(--bg)_86%,transparent)] backdrop-blur-md">
-  <div class="mx-auto flex h-16 max-w-[1280px] items-center justify-between gap-3 px-[clamp(16px,4vw,32px)]">
-    <a href="#top" aria-label="Maitty home" class="flex items-center gap-2.5 font-display text-[15px] font-extrabold tracking-[.04em] text-foam no-underline">
-      <img src="/img/maitty-logo.svg" alt="" width="40" height="34" class="block h-auto w-10" />
-      <span>M<span class="text-teal">AI</span>TTY</span>
+<header style="position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--line)">
+  <div aria-hidden="true" data-progress style="position:absolute;left:0;right:0;bottom:-1px;height:2px;background:var(--strong);transform-origin:0 50%;transform:scaleX(0)"></div>
+  <div class="bar">
+    <a href="#top" class="brand">
+      <img src="/img/maiker-logo.png" alt="" width="28" height="28" style="display:block" />
+      <span class="word">M<span class="ai">ai</span>ker</span>
     </a>
-    <nav aria-label="Main" class="flex items-center gap-[clamp(8px,2.2vw,22px)] font-mono text-[13px] font-medium">
-      {/* Phones keep GitHub and the theme; the install block opens the page. */}
-      <a class={`${link} phone:hidden`} href="#install">install</a>
-      <a class={`${link} phone:hidden`} href="https://github.com/CydoEntis/maitty/blob/main/docs/guide.md">guide</a>
-      <a class={link} href="https://github.com/CydoEntis/maitty">github</a>
-      <ThemeToggle />
+    <nav aria-label="Sections">
+      <a href="#status">Status</a>
+      <a href="#review">Review</a>
+      <a href="#agents">Agents</a>
+      <a href={REPO}>GitHub</a>
     </nav>
+    <button type="button" class="theme" data-theme-toggle aria-label="Switch to Day theme"><span data-theme-word>Day</span></button>
+    <a href="#install" class="btn-inv install">Install</a>
   </div>
 </header>
+
+<style>
+  .bar { max-width: 1360px; margin: 0 auto; padding: 10px 24px; display: flex; align-items: center; gap: 20px; }
+  .brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--strong); }
+  .word { font: 800 17px var(--font-display); letter-spacing: -.02em; }
+  nav { display: flex; gap: 22px; margin-left: auto; font-size: 14px; color: var(--muted); flex-wrap: wrap; }
+  nav a { text-decoration: none; }
+  .theme { height: 32px; padding: 0 12px; border: 1px solid var(--line2); background: transparent; color: var(--strong); border-radius: 6px; font: 600 12px var(--font-mono); }
+  .install { height: 32px; padding: 0 14px; border-radius: 6px; font-size: 13px; }
+  @media (max-width: 560px) { nav { display: none; } .theme { margin-left: auto; } }
+</style>
+
+<script>
+  import "./theme";
+</script>

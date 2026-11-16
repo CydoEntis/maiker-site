@@ -1,0 +1,24 @@
+---
+// The desktop demo on its own, full size, for phones: the hero swaps it for a
+// link here. It scrolls sideways rather than shrink past reading.
+import "../styles/global.css";
+import Desktop from "../sections/hero/Desktop.astro";
+---
+<!doctype html>
+<html lang="en" data-theme="night">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Maiker desktop demo</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" href="/img/favicon-32.png" sizes="32x32" type="image/png" />
+    <script is:inline src="/boot.js"></script>
+  </head>
+  <body style="background:#0f1013;overflow-x:auto">
+    <div id="live" aria-live="polite" class="sr-only"></div>
+    <section style="min-width:900px"><Desktop /></section>
+    <script>
+      import "../sections/hero/hero";
+    </script>
+  </body>
+</html>

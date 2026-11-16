@@ -1,22 +1,25 @@
-// Every [data-theme-pick] button (the header toggle and the theme cards in
-// "Make it yours") switches the page and remembers the choice.
+// The header button switches the page between Night and Day and remembers the
+// choice. Its label is the theme it switches to.
 const root = document.documentElement;
-const picks = () => document.querySelectorAll<HTMLElement>("[data-theme-pick]");
+const button = document.querySelector<HTMLElement>("[data-theme-toggle]")!;
 
 type Theme = "night" | "day";
 
 const REVEAL_MS = 600;
 const REVEAL_EASE = "cubic-bezier(.2, .7, .2, 1)";
 
+const current = (): Theme => (root.dataset.theme === "day" ? "day" : "night");
+
 function sync() {
-  const theme = root.dataset.theme;
-  picks().forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.themePick === theme)));
+  const next = current() === "night" ? "Day" : "Night";
+  button.setAttribute("aria-label", `Switch to ${next} theme`);
+  button.querySelector("[data-theme-word]")!.textContent = next;
 }
 
 function apply(theme: Theme) {
   root.dataset.theme = theme;
-  document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')!.content = theme === "day" ? "#f6f8fa" : "#08111d";
-  try { localStorage.setItem("maitty-theme", theme); } catch { /* storage blocked: the choice lasts this visit */ }
+  document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')!.content = theme === "day" ? "#f3f3f0" : "#0a0a0b";
+  try { localStorage.setItem("maiker-theme", theme); } catch { /* storage blocked: the choice lasts this visit */ }
   sync();
 }
 
@@ -33,7 +36,7 @@ const isSkipped = (e: unknown) => e instanceof DOMException && e.name === "Abort
 
 function setTheme(theme: Theme) {
   const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (theme === root.dataset.theme || still || !document.startViewTransition) {
+  if (still || !document.startViewTransition) {
     // Without the reveal, switch every colour at once: reading a style flushes the change while transitions are off.
     root.toggleAttribute("data-theme-switching", true);
     apply(theme);
@@ -50,8 +53,5 @@ function setTheme(theme: Theme) {
   transition.finished.finally(() => root.removeAttribute("data-theme-switching"));
 }
 
-document.addEventListener("click", (e) => {
-  const pick = (e.target as Element).closest<HTMLElement>("[data-theme-pick]");
-  if (pick) setTheme(pick.dataset.themePick === "day" ? "day" : "night");
-});
+button.addEventListener("click", () => setTheme(current() === "night" ? "day" : "night"));
 sync();

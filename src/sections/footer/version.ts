@@ -1,13 +1,12 @@
-// The footer shows the latest release; the version stays hidden if GitHub's
-// API can't be reached. It is the only request the page makes to anyone else.
+// The hero pill and the footer show the latest release; the version stays
+// hidden (the pill reads "Latest release") if GitHub's API can't be reached.
+// It is the only request the page makes to anyone else.
 const RELEASES = "https://api.github.com/repos/CydoEntis/maitty/releases/latest";
-const CACHE_KEY = "maitty-ver";
+const CACHE_KEY = "maiker-ver";
 
 function show(tag: string) {
-  const box = document.querySelector<HTMLElement>("[data-version]");
-  if (!box) return;
-  box.querySelector("a")!.textContent = tag;
-  box.hidden = false;
+  document.querySelectorAll("[data-ver]").forEach((el) => { el.textContent = tag; });
+  document.querySelectorAll<HTMLElement>("[data-ver-footer]").forEach((el) => { el.hidden = false; });
 }
 
 async function latestTag(): Promise<string> {

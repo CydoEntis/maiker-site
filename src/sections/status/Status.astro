@@ -1,50 +1,55 @@
----
-// "Know who needs you": the chips pick a state for bold-puffin's row; left
-// alone, the row flips between working and needs you every few seconds.
-import { STATES, STATE_KEYS } from "../../lib/states";
----
-<section data-status aria-labelledby="s-title" class="border-t border-line bg-card py-[clamp(72px,10vw,128px)]">
-  <div class="mx-auto grid max-w-[1280px] grid-cols-[repeat(auto-fit,minmax(min(100%,440px),1fr))] items-center gap-[clamp(32px,5vw,64px)] px-[clamp(16px,4vw,32px)]">
-    <div>
-      <h2 data-reveal id="s-title" class="m-0 mb-4 font-display text-[clamp(26px,3.6vw,44px)]/[1.12] font-bold tracking-[-.035em] text-strong">Know who needs you.</h2>
-      <p data-reveal class="m-0 mb-7 max-w-[50ch] text-muted">Every session shows its state, read from the agent's own hooks where it's connected, and from its screen otherwise. When one waits, Maitty plays a sound and can send an alert to your phone.</p>
-      <div role="group" aria-label="Pick a state" class="flex flex-wrap gap-2.5">
-        {STATE_KEYS.map((k) => (
-          <button type="button" data-state-pick={k} aria-pressed={k === "working" ? "true" : "false"} class="chip flex h-11 items-center gap-2.5 rounded-btn border-2 px-3.5 font-mono text-sm font-bold" style={`--c:${STATES[k].color}`}>
-            <span data-spin={k === "working" ? "" : undefined}>{k === "working" ? "⠴" : k === "idle" ? "○" : "●"}</span>{STATES[k].word}
-          </button>
-        ))}
-      </div>
-      <p data-state-about class="mt-4 mb-0 text-[15px] text-muted">{STATES.working.about}</p>
+<section id="status" aria-labelledby="h-status" class="sec">
+  <div class="wrap">
+    <p data-rv class="eyebrow">Know who needs you</p>
+    <h2 data-rv id="h-status" class="h2" style="max-width:18ch">It reads the agent, not the screen.</h2>
+    <p data-rv class="lede" style="max-width:58ch">Status comes from each agent's own hooks. Where an agent has none, Maiker reads its process and screen instead. Every state has its own shape and word, so it reads without colour too.</p>
+    <div data-rv-kids class="states">
+      <div class="cell"><div aria-hidden="true" class="glyph" style="color:var(--working)"><span data-spin>⠋</span></div><h3>working</h3><p>Busy on a turn. Leave it be.</p></div>
+      <div class="cell needs"><div aria-hidden="true" class="glyph pulse" style="color:var(--needs)">!</div><h3 style="color:var(--needs)">needs you</h3><p>A question or a permission. Always first in the list, never drawn in any other colour.</p></div>
+      <div class="cell"><div aria-hidden="true" class="glyph" style="color:var(--done)">✓</div><h3>done</h3><p>Finished its turn. Stays marked until you've looked.</p></div>
+      <div class="cell"><div aria-hidden="true" class="glyph" style="color:var(--dim)">○</div><h3>idle</h3><p>At rest. Nothing waiting.</p></div>
     </div>
-    <div aria-hidden="true" class="term text-[13px]/[20px] sm:text-sm/[20px]">
-      <div class="flex h-[26px] items-center bg-tm-bar px-3"><span class="bg-tm-chip px-1.5 text-tm-strong"><b>SESSIONS</b> 3</span></div>
-      <div class="flex flex-col pt-3.5 pb-[18px]">
-        <div class="grid grid-cols-[2ch_minmax(0,1fr)_auto] gap-2 px-3.5"><span class="font-bold text-tm-d3">–</span><b class="text-tm-strong">acme-store</b><span class="text-tm-dim">⎇ main</span></div>
-        <div data-demo-row data-look="working" class="bg-tm-sel px-3.5 py-0.5 shadow-[inset_2px_0_0_var(--t-teal)]">
-          <div class="grid grid-cols-[2ch_minmax(0,1fr)_auto] gap-2 pl-[2ch]"><span data-demo-glyph data-spin class="glyph font-bold">⠴</span><span class="name font-bold">bold-puffin</span><span class="text-tm-dim">✻ 37m</span></div>
-          <div data-demo-sub class="sub pl-[calc(4ch+8px)]">1 agent</div>
+    <div class="cols" style="margin-top:56px;gap:48px">
+      <div data-rv-kids class="chan">
+        <div><h3>♪ A sound</h3><p>Two rising notes when one needs you. Finishing stays quiet.</p></div>
+        <div><h3>▢ A card</h3><p>A card in the window names the agent and what it asked. Click it to jump straight there.</p></div>
+      </div>
+      <div data-rv class="right">
+        <div class="toast" aria-hidden="true">
+          <div class="th"><span class="tile"><img src="/img/maiker-logo.png" alt="" width="18" height="18" /><span class="badge"></span></span><span class="tn">bold-puffin</span><span class="tneeds">needs you</span></div>
+          <p class="ask">Allow Bash(pnpm install --frozen-lockfile=false)?</p>
+          <div class="tb"><span class="answer">Answer</span><span class="later">Later</span><span class="when">just now</span></div>
         </div>
-        <div class="grid grid-cols-[2ch_minmax(0,1fr)_auto] gap-2 px-3.5 pt-0.5"><span></span><span class="grid grid-cols-[2ch_minmax(0,1fr)] gap-2"><span data-spin class="font-bold text-tm-teal">⠴</span><span class="font-bold text-tm-work">keen-gull</span></span><span class="text-tm-dim">✻ 4m</span></div>
-        <div class="grid grid-cols-[2ch_minmax(0,1fr)_auto] gap-2 px-3.5 pt-0.5"><span></span><span class="grid grid-cols-[2ch_minmax(0,1fr)] gap-2"><span class="text-tm-dim">○</span><span class="text-tm-c9">claude 1</span></span><span class="text-tm-dim">✻ 19m</span></div>
+        <button type="button" class="chime" data-chime>♪ Hear the alert</button>
       </div>
     </div>
   </div>
 </section>
 
 <style>
-  .chip { border-color: var(--line); background: var(--bg); color: var(--text); transition: all .15s; }
-  .chip:hover { transform: translate(-1px, -1px); }
-  .chip[aria-pressed="true"] { border-color: var(--c); background: var(--c); color: var(--ink); box-shadow: 3px 3px 0 var(--hard); }
-  [data-look="working"] .glyph { color: var(--t-teal); }
-  [data-look="working"] .name { color: var(--t-work); }
-  [data-look="working"] .sub { color: var(--t-dim); }
-  [data-look="needs"] .glyph { color: var(--t-amber); }
-  [data-look="needs"] .name { color: var(--t-strong); }
-  [data-look="needs"] .sub { color: var(--t-amber); }
-  [data-look="done"] .glyph, [data-look="done"] .name, [data-look="done"] .sub { color: var(--t-green); }
-  [data-look="idle"] .glyph, [data-look="idle"] .sub { color: var(--t-dim); }
-  [data-look="idle"] .name { color: var(--t-c9); font-weight: 400; }
+  .states { margin-top: 48px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .cell { background: var(--card); padding: 28px 24px; }
+  .cell.needs { background: var(--needs-soft); }
+  .glyph { font: 800 56px/1 var(--font-display); }
+  .glyph.pulse { animation: mtGlow 1.28s ease-in-out infinite; }
+  .cell h3 { margin: 22px 0 6px; font: 700 18px var(--font-display); color: var(--strong); }
+  .cell p, .chan p { font-size: 15px; color: var(--muted); }
+  .chan { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px 32px; }
+  .chan h3 { margin-bottom: 6px; font: 700 14px var(--font-display); color: var(--strong); }
+  .right { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
+  .toast { width: 100%; max-width: 360px; background: var(--card); border: 1px solid var(--line2); border-radius: 14px; padding: 12px 12px 12px 14px; box-shadow: var(--shadow); animation: mtToast 12s cubic-bezier(.2,.8,.2,1) infinite; }
+  .th { display: flex; align-items: center; gap: 10px; }
+  .tile { position: relative; width: 26px; height: 26px; border-radius: 6px; background: #0a0a0b; display: grid; place-items: center; }
+  .badge { position: absolute; right: -3px; bottom: -3px; width: 11px; height: 11px; border-radius: 3px; background: var(--needs); }
+  .tn { font: 600 13px var(--font-sans); color: var(--strong); }
+  .tneeds { font: 500 12px var(--font-sans); color: var(--needs); }
+  .ask { margin: 8px 0 10px; font: 400 12px/1.5 var(--font-mono); color: var(--text); }
+  .tb { display: flex; align-items: center; gap: 8px; }
+  .answer, .later { height: 28px; padding: 0 12px; display: inline-flex; align-items: center; border-radius: 6px; font: 600 12px var(--font-sans); }
+  .answer { background: var(--needs); color: var(--on-accent); }
+  .later { border: 1px solid var(--line2); color: var(--text); }
+  .when { margin-left: auto; font-size: 12px; color: var(--dim); }
+  .chime { height: 44px; padding: 0 18px; border: 1px solid var(--line2); background: transparent; color: var(--strong); border-radius: 8px; font: 600 13px var(--font-mono); }
 </style>
 
 <script>

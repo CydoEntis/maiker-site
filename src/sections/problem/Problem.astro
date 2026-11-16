@@ -1,23 +1,21 @@
----
-// The waiting time counts up from ten minutes while the visitor reads.
----
-<section aria-labelledby="p-title" class="border-t border-line py-[clamp(72px,10vw,128px)]">
-  <div class="mx-auto max-w-[1280px] px-[clamp(16px,4vw,32px)]">
-    <h2 data-reveal id="p-title" class="m-0 mb-6 max-w-[24ch] font-display text-[clamp(26px,4.2vw,52px)]/[1.12] font-bold tracking-[-.035em] text-balance text-strong">
-      Five agents, five tabs, and one of them has been <span class="text-needs">waiting for you</span> for <span data-waiting class="tabular-nums">10:00</span>.
-    </h2>
-    <p class="m-0 max-w-[54ch] text-[clamp(18px,1.6vw,21px)] text-muted">Maitty keeps the whole crew in one window, shows what each agent is doing, and rings the bell the moment one needs you.</p>
+<section aria-labelledby="h-problem" class="inv">
+  <div class="in">
+    <p data-rv class="eb">Meanwhile, without Maiker · tab 4 of 6</p>
+    <div aria-hidden="true" data-slide data-clock class="clock">00:47:12</div>
+    <h2 data-rv id="h-problem">That's how long an agent has sat on "Do you want to proceed?" while you watched the other five.</h2>
+    <p data-rv class="kick">With Maiker you'd have known at 00:00:01.</p>
   </div>
 </section>
 
-<script>
-  import { onTick } from "../../lib/ticker";
+<style>
+  .inv { background: var(--inv-bg); color: var(--inv-fg); overflow-x: clip; }
+  .in { max-width: 1360px; margin: 0 auto; padding: clamp(64px, 9vw, 128px) 24px; }
+  .eb { font: 700 12px var(--font-display); letter-spacing: .14em; text-transform: uppercase; opacity: .75; }
+  .clock { margin-top: 18px; will-change: transform; font: 800 clamp(56px, 14vw, 220px)/.9 var(--font-display); letter-spacing: -.06em; font-variant-numeric: tabular-nums; }
+  h2 { margin-top: 28px; max-width: 30ch; font: 600 clamp(22px, 2.6vw, 34px)/1.25 var(--font-sans); letter-spacing: -.015em; text-wrap: balance; }
+  .kick { margin-top: 16px; font: 400 15px var(--font-mono); opacity: .8; }
+</style>
 
-  const START_S = 600;
-  const el = document.querySelector<HTMLElement>("[data-waiting]")!;
-  const t0 = Date.now();
-  onTick(el, () => {
-    const s = START_S + Math.floor((Date.now() - t0) / 1000);
-    el.textContent = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-  });
+<script>
+  import "./problem";
 </script>

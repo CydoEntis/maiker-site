@@ -1,0 +1,30 @@
+---
+import { GLYPH, SESSIONS } from "../../lib/sessions";
+const local = SESSIONS.filter((s) => !s.machine).slice(0, 4);
+const remote = SESSIONS.filter((s) => s.machine);
+---
+<section aria-labelledby="h-remote" class="sec" style="background:var(--p1)">
+  <div class="wrap cols">
+    <div>
+      <p data-rv class="eyebrow">Other machines</p>
+      <h2 data-rv id="h-remote" class="h2">The box under the desk, in the same list.</h2>
+      <p data-rv class="lede" style="max-width:48ch">Add any computer you reach over SSH. Its sessions sit beside your own, and Maiker offers to install itself there if it's missing.</p>
+    </div>
+    <div data-rv class="card">
+      <div class="mh">This computer<span class="dot"></span></div>
+      {local.map((s) => <div class="r" data-sess={s.id} data-state={s.state}><span class="g" data-glyph>{GLYPH[s.state]}</span><b>{s.name}</b><span class="pj">{s.project}</span></div>)}
+      <div class="mh" style="padding-top:16px">build-box · ssh<span class="dot"></span></div>
+      {remote.map((s) => <div class="r" data-sess={s.id} data-state={s.state}><span class="g" data-glyph>{GLYPH[s.state]}</span><b>{s.name}</b><span class="pj">{s.project}</span></div>)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px; box-shadow: var(--shadow); font-size: 14px; }
+  .mh { display: flex; align-items: center; gap: 8px; padding: 4px 8px 8px; font: 700 11px var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .dot { margin-left: auto; width: 7px; height: 7px; border-radius: 50%; background: var(--done); }
+  .r { display: flex; gap: 10px; padding: 6px 8px; }
+  .g { width: 14px; font: 600 13px var(--font-mono); color: var(--c); }
+  .r b { color: var(--strong); font-weight: 600; }
+  .pj { color: var(--dim); }
+</style>

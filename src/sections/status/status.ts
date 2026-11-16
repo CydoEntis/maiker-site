@@ -1,41 +1,24 @@
-import { STATES, STATE_KEYS, type SessionState } from "../../lib/states";
-import { onTick, spinGlyph } from "../../lib/ticker";
+// "Hear the alert": the two rising notes the app plays when an agent needs
+// you, E5 then B5, made with Web Audio so the page ships no sound file.
+import { announce } from "../../lib/announce";
 
-const FLIP_MS = 4000;
-const SUB: Record<SessionState, string> = { working: "1 agent", needs: "asks: Allow Bash(pnpm install)?", done: "done · not seen", idle: "idle" };
+const NOTES: [number, number][] = [[659.25, 0], [987.77, 0.16]];
 
-const section = document.querySelector<HTMLElement>("[data-status]")!;
-const row = section.querySelector<HTMLElement>("[data-demo-row]")!;
-const glyph = section.querySelector<HTMLElement>("[data-demo-glyph]")!;
-const t0 = Date.now();
-let picked: SessionState | null = null;
-let shown: SessionState | null = null;
-
-const auto = (): SessionState => picked ?? (Math.floor((Date.now() - t0) / FLIP_MS) % 2 ? "needs" : "working");
-
-function paint() {
-  const state = auto();
-  if (state === shown) return;
-  shown = state;
-  row.dataset.look = state;
-  glyph.toggleAttribute("data-spin", state === "working");
-  glyph.textContent = state === "working" ? spinGlyph() : state === "idle" ? "○" : "●";
-  section.querySelector("[data-demo-sub]")!.textContent = SUB[state];
-  section.querySelector("[data-state-about]")!.textContent = STATES[state].about;
-  section.querySelectorAll<HTMLElement>("[data-state-pick]").forEach((b) => {
-    b.setAttribute("aria-pressed", String(b.dataset.statePick === state));
-  });
-}
-
-section.addEventListener("click", (e) => {
-  const chip = (e.target as Element).closest<HTMLElement>("[data-state-pick]");
-  if (!chip) return;
-  const k = chip.dataset.statePick as SessionState;
-  if (!STATE_KEYS.includes(k)) return;
-  picked = picked === k ? null : k;
-  shown = null;
-  paint();
+document.querySelector("[data-chime]")?.addEventListener("click", () => {
+  try {
+    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const ctx = new Ctx();
+    for (const [freq, at] of NOTES) {
+      const osc = ctx.createOscillator(), gain = ctx.createGain(), t = ctx.currentTime + at;
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, t);
+      gain.gain.linearRampToValueAtTime(0.18, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.4);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.45);
+    }
+  } catch { /* no audio available: the live region still says what would have played */ }
+  announce("Played the needs-you alert");
 });
-
-onTick(section, paint);
-paint();

@@ -1,5 +1,6 @@
-// The OS tabs and the copy buttons of every install block. The chosen OS lives
-// on <html data-os>, so both blocks always agree.
+// The OS tabs and every copy button (the hero's and the install block's). The
+// chosen OS lives on <html data-os>, so both always agree. The hero's download
+// button names the visitor's OS, which boot.js worked out.
 import { announce } from "../../lib/announce";
 import { COMMANDS, type Os } from "./commands";
 
@@ -9,14 +10,27 @@ const isMac = /mac/i.test((navigator as Navigator & { userAgentData?: { platform
 const COPY_KEY = isMac ? "⌘C" : "Ctrl+C";
 
 const currentOs = (): Os => (root.dataset.os === "nix" ? "nix" : "win");
+const text = (sel: string, value: string) => document.querySelectorAll(sel).forEach((el) => { el.textContent = value; });
 
-function syncTabs() {
-  document.querySelectorAll<HTMLElement>("[data-os-tab]").forEach((t) => t.setAttribute("aria-selected", String(t.dataset.osTab === currentOs())));
+function sync() {
+  const os = currentOs(), c = COMMANDS[os];
+  document.querySelectorAll<HTMLElement>("[data-os-tab]").forEach((t) => {
+    const on = t.dataset.osTab === os;
+    t.setAttribute("aria-selected", String(on));
+    t.style.opacity = on ? "1" : ".7";
+    t.style.borderColor = on ? "currentColor" : "transparent";
+  });
+  text("[data-cmd-prompt]", c.prompt);
+  text("[data-cmd-short]", c.short);
+  text("[data-cmd]", c.cmd);
+  text("[data-shell]", c.shell);
+  document.querySelectorAll("[data-cmd-block]").forEach((el) => el.setAttribute("aria-label", `Install command for ${c.shell}`));
+  document.querySelectorAll("[data-copy]").forEach((el) => el.setAttribute("aria-label", `Copy the install command: ${c.cmd}`));
 }
 
-function copyWithSelection(text: string): boolean {
+function copyWithSelection(value: string): boolean {
   const ta = document.createElement("textarea");
-  ta.value = text;
+  ta.value = value;
   ta.style.position = "fixed";
   ta.style.opacity = "0";
   document.body.appendChild(ta);
@@ -27,34 +41,30 @@ function copyWithSelection(text: string): boolean {
   return ok;
 }
 
-async function copy(text: string): Promise<boolean> {
-  if (!navigator.clipboard || !window.isSecureContext) return copyWithSelection(text);
+async function copy(value: string): Promise<boolean> {
+  if (!navigator.clipboard || !window.isSecureContext) return copyWithSelection(value);
   try {
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(value);
     return true;
   } catch {
-    return copyWithSelection(text);
+    return copyWithSelection(value);
   }
-}
-
-function setLabel(button: HTMLElement, icon: string, label: string) {
-  button.querySelector("[data-copy-icon]")!.textContent = icon;
-  button.querySelector("[data-copy-label]")!.textContent = label;
 }
 
 let resetTimer: number | undefined;
 function showCopied(ok: boolean) {
-  const buttons = document.querySelectorAll<HTMLElement>("[data-copy]");
-  buttons.forEach((b) => { b.dataset.copied = ok ? "ok" : "fail"; setLabel(b, ok ? "✓" : "", ok ? "copied" : `press ${COPY_KEY}`); });
+  text("[data-copy-label]", ok ? "Copied ✓" : `Press ${COPY_KEY}`);
   announce(ok ? "Install command copied" : `Copy failed. Select the command and press ${COPY_KEY}.`);
   window.clearTimeout(resetTimer);
-  resetTimer = window.setTimeout(() => buttons.forEach((b) => { delete b.dataset.copied; setLabel(b, "⧉", "copy"); }), COPIED_MS);
+  resetTimer = window.setTimeout(() => text("[data-copy-label]", "Copy"), COPIED_MS);
 }
 
 document.addEventListener("click", (e) => {
   const target = e.target as Element;
   const tab = target.closest<HTMLElement>("[data-os-tab]");
-  if (tab) { root.dataset.os = tab.dataset.osTab === "nix" ? "nix" : "win"; syncTabs(); }
+  if (tab) { root.dataset.os = tab.dataset.osTab === "nix" ? "nix" : "win"; sync(); text("[data-copy-label]", "Copy"); }
   if (target.closest("[data-copy]")) copy(COMMANDS[currentOs()].cmd).then(showCopied);
 });
-syncTabs();
+
+text("[data-dl]", `Download for ${root.dataset.osName || "your computer"}`);
+sync();
